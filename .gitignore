@@ -1,0 +1,41 @@
+# Environment & secrets
+.env
+.env.*
+*.env
+!.env.example
+
+# Dependencies & package manager cache
+node_modules/
+.pnpm-store/
+
+# Archives & logs
+*.zip
+*.log
+error.json
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary / local helper files (root)
+/scratch/
+/test_extract/
+/unzip.php
+/do_*.js
+/fix_*.js
+/scratch_*.js
+/find_missing_icons.js
+/refactor_icons.js
+/start_tunnel.js
+/update_dash*.js
+
+# Temporary / debug files (apps/api)
+apps/api/patch/
+apps/api/ROOT-patch/
+apps/api/deployment_patch/
+apps/api/patch-*.mjs
+apps/api/seeder_gen.php
+apps/api/test.php
+apps/api/public/check.php

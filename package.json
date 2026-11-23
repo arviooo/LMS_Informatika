@@ -1,0 +1,19 @@
+{
+  "name": "lms-informatika-spengu",
+  "private": true,
+  "version": "1.0.0",
+  "description": "LMS Informatika SMP Negeri 3 Gubug - Kurikulum Merdeka",
+  "scripts": {
+    "dev": "pnpm --filter @lms/web dev",
+    "build": "pnpm --filter @lms/web build",
+    "preview": "pnpm --filter @lms/web preview"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "core-js"
+    ]
+  },
+  "dependencies": {
+    "localtunnel": "^2.0.2"
+  }
+}

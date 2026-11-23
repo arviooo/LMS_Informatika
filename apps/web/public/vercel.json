@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/sanctum/(.*)", "destination": "https://lms-skripsi-arvios-123.loca.lt/sanctum/$1" },
+    { "source": "/api/(.*)", "destination": "https://lms-skripsi-arvios-123.loca.lt/api/$1" },
+    { "source": "/storage/(.*)", "destination": "https://lms-skripsi-arvios-123.loca.lt/storage/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

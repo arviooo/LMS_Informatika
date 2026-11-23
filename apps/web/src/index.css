@@ -1,0 +1,448 @@
+/* =============================================================
+   LMS Informatika Spengu — Design System
+   Tailwind CSS v4 + Material Design 3 Tokens
+   ============================================================= */
+
+@import "tailwindcss";
+
+/* ─── MD3 Color Tokens (CSS Custom Properties) ─────────────── */
+@theme {
+  /* Primary */
+  --color-primary: #004ac6;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #2563eb;
+  --color-on-primary-container: #eeefff;
+  --color-primary-fixed: #dbe1ff;
+  --color-primary-fixed-dim: #b4c5ff;
+  --color-on-primary-fixed: #00174b;
+  --color-on-primary-fixed-variant: #003ea8;
+  --color-inverse-primary: #b4c5ff;
+
+  /* Secondary */
+  --color-secondary: #006c49;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #6cf8bb;
+  --color-on-secondary-container: #00714d;
+  --color-secondary-fixed: #6ffbbe;
+  --color-secondary-fixed-dim: #4edea3;
+  --color-on-secondary-fixed: #002113;
+  --color-on-secondary-fixed-variant: #005236;
+
+  /* Tertiary */
+  --color-tertiary: #784b00;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #996100;
+  --color-on-tertiary-container: #ffeedd;
+  --color-tertiary-fixed: #ffddb8;
+  --color-tertiary-fixed-dim: #ffb95f;
+  --color-on-tertiary-fixed: #2a1700;
+  --color-on-tertiary-fixed-variant: #653e00;
+
+  /* Error */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Surface (Warm Sunny Cream Palette) */
+  --color-surface: #fffdf8;
+  --color-on-surface: #18181b;
+  --color-surface-variant: #fde68a;
+  --color-on-surface-variant: #52525b;
+  --color-surface-dim: #fef3c7;
+  --color-surface-bright: #fffdf8;
+  --color-surface-tint: #2563eb;
+
+  /* Surface Containers */
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fef9ee;
+  --color-surface-container: #fef3c7;
+  --color-surface-container-high: #fde68a;
+  --color-surface-container-highest: #fcd34d;
+
+  /* Inverse */
+  --color-inverse-surface: #213145;
+  --color-inverse-on-surface: #eaf1ff;
+
+  /* Outline */
+  --color-outline: #737686;
+  --color-outline-variant: #c3c6d7;
+
+  /* Background */
+  --color-background: #f8f9ff;
+  --color-on-background: #0b1c30;
+
+  /* ─── Typography ────────────────────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Font Sizes (name: [size, { lineHeight, fontWeight, letterSpacing? }]) */
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--font-weight: 500;
+  --text-label-sm--letter-spacing: 0.02em;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--font-weight: 600;
+
+  --text-label-lg: 14px;
+  --text-label-lg--line-height: 20px;
+  --text-label-lg--font-weight: 600;
+
+  --text-body-sm: 12px;
+  --text-body-sm--line-height: 16px;
+  --text-body-sm--font-weight: 400;
+
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+  --text-body-md--font-weight: 400;
+
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-body-lg--font-weight: 400;
+
+  --text-headline-sm: 18px;
+  --text-headline-sm--line-height: 24px;
+  --text-headline-sm--font-weight: 600;
+
+  --text-headline-md: 22px;
+  --text-headline-md--line-height: 28px;
+  --text-headline-md--font-weight: 600;
+
+  --text-headline-lg: 30px;
+  --text-headline-lg--line-height: 38px;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 32px;
+  --text-headline-lg-mobile--font-weight: 700;
+
+  /* ─── Spacing ───────────────────────────────────────────── */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-gutter: 1rem;
+  --space-gutter-mobile: 0.75rem;
+  --space-margin: 1.5rem;
+  --space-margin-mobile: 1rem;
+
+  /* ─── Border Radius ─────────────────────────────────────── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+
+  /* ─── Animations ────────────────────────────────────────── */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-slide-down: slide-down 0.2s ease-in;
+  --animate-scale-in: scale-in 0.2s ease-out;
+  --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ─── Keyframes ───────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(1rem); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes splash-progress {
+  0% { width: 10%; opacity: 0.7; }
+  50% { width: 75%; opacity: 1; }
+  100% { width: 100%; opacity: 0.9; }
+}
+
+/* ─── Base Styles ─────────────────────────────────────────── */
+@layer base {
+  html {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    font-weight: var(--text-body-md--font-weight);
+    color: var(--color-on-surface);
+    background-color: var(--color-surface);
+    touch-action: pan-y pinch-zoom;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  dialog:modal {
+    overscroll-behavior: contain;
+  }
+
+  dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    scrollbar-width: none;
+  }
+
+  /* Safe area padding utilities */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Scroll reveal & interactive hover animations (compositor-only, reduced-motion safe) */
+  .scroll-reveal {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    @media (prefers-reduced-motion: no-preference) {
+      opacity: 0;
+      transform: translate3d(0, 28px, 0) scale(0.97);
+      transition:
+        opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  }
+
+  .scroll-reveal.is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* ─── Component Utilities ─────────────────────────────────── */
+@layer utilities {
+  /* Material Symbols sizing helper */
+  .icon-sm { font-size: 18px; }
+  .icon-md { font-size: 20px; }
+  .icon-lg { font-size: 24px; }
+
+  .icon-filled {
+    font-variation-settings: 'FILL' 1;
+  }
+
+  /* Typography utilities */
+  .text-label-sm {
+    font-size: var(--text-label-sm);
+    line-height: var(--text-label-sm--line-height);
+    font-weight: var(--text-label-sm--font-weight);
+    letter-spacing: var(--text-label-sm--letter-spacing);
+  }
+
+  .text-label-md {
+    font-size: var(--text-label-md);
+    line-height: var(--text-label-md--line-height);
+    font-weight: var(--text-label-md--font-weight);
+  }
+
+  .text-label-lg {
+    font-size: var(--text-label-lg);
+    line-height: var(--text-label-lg--line-height);
+    font-weight: var(--text-label-lg--font-weight);
+  }
+
+  .text-body-sm {
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm--line-height);
+    font-weight: var(--text-body-sm--font-weight);
+  }
+
+  .text-body-md {
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    font-weight: var(--text-body-md--font-weight);
+  }
+
+  .text-body-lg {
+    font-size: var(--text-body-lg);
+    line-height: var(--text-body-lg--line-height);
+    font-weight: var(--text-body-lg--font-weight);
+  }
+
+  .text-headline-sm {
+    font-size: var(--text-headline-sm);
+    line-height: var(--text-headline-sm--line-height);
+    font-weight: var(--text-headline-sm--font-weight);
+  }
+
+  .text-headline-md {
+    font-size: var(--text-headline-md);
+    line-height: var(--text-headline-md--line-height);
+    font-weight: var(--text-headline-md--font-weight);
+  }
+
+  .text-headline-lg {
+    font-size: var(--text-headline-lg);
+    line-height: var(--text-headline-lg--line-height);
+    font-weight: var(--text-headline-lg--font-weight);
+  }
+
+  .text-headline-lg-mobile {
+    font-size: var(--text-headline-lg-mobile);
+    line-height: var(--text-headline-lg-mobile--line-height);
+    font-weight: var(--text-headline-lg-mobile--font-weight);
+  }
+
+  /* Spin animation for loading */
+  .animate-spin-slow {
+    animation: spin 1.2s linear infinite;
+  }
+
+  /* Shimmer Skeleton Loading Effect */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(211, 228, 254, 0.45) 25%,
+      rgba(255, 255, 255, 0.85) 50%,
+      rgba(211, 228, 254, 0.45) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  .animate-splash-progress {
+    animation: splash-progress 1.4s ease-out forwards;
+  }
+}
+
+/* ─── SweetAlert2 Mobile & Typography Clean Fix ──────────── */
+.swal2-container {
+  z-index: 99999 !important;
+}
+
+.swal2-popup {
+  border-radius: 1.5rem !important;
+  font-family: var(--font-sans) !important;
+  padding: 1.5rem 1.25rem !important;
+  max-width: 92vw !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.swal2-icon {
+  margin: 0.5rem auto 0.25rem !important;
+  transform: scale(0.85);
+}
+
+.swal2-title {
+  font-size: 1.25rem !important;
+  line-height: 1.5 !important;
+  font-weight: 700 !important;
+  padding: 0.5rem 0.5rem 0 !important;
+  margin: 0 !important;
+  display: block !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+  text-align: center !important;
+}
+
+.swal2-html-container {
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  margin: 0.75rem 0 0 !important;
+  text-align: left !important;
+}
+
+.swal2-actions {
+  margin-top: 1.25rem !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+}
+
+.swal2-confirm, .swal2-cancel {
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 0.625rem 1.25rem !important;
+}
+
+/* ─── Native <details> Accordion Smooth Progressive Enhancement ─── */
+details.gradebook-accordion > summary {
+  list-style: none;
+}
+
+details.gradebook-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.gradebook-accordion::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+details.gradebook-accordion:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  details.gradebook-accordion::details-content {
+    transition: block-size, content-visibility, display;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+    transition-behavior: allow-discrete;
+  }
+
+  details.gradebook-accordion > summary .accordion-chevron {
+    transition: transform 0.2s ease;
+  }
+}
+
+details.gradebook-accordion[open] > summary .accordion-chevron {
+  transform: rotate(180deg);
+}
