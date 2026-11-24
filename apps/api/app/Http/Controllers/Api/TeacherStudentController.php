@@ -286,7 +286,7 @@ class TeacherStudentController extends Controller
         }
         
         $student->update([
-            'password' => Hash::make('spengu123')
+            'password' => Hash::make('spentigu123')
         ]);
         
         return response()->json([
@@ -310,7 +310,7 @@ class TeacherStudentController extends Controller
         }
 
         $validated['role'] = 'siswa';
-        $validated['password'] = Hash::make('spengu123');
+        $validated['password'] = Hash::make('spentigu123');
         $validated['is_active'] = true;
 
         $student = User::create($validated);

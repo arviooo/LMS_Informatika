@@ -231,7 +231,7 @@ export default function HeaderBar({ onNotification, title, subtitle, backUrl, va
           {showMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-lg border border-surface-variant/20 py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
               <div className="px-4 py-2 border-b border-surface-variant/20 mb-2">
-                <p className="text-sm font-bold text-on-surface truncate">{user?.name && user.name !== '0987654321' ? user.name : (user?.role === 'guru' ? 'Tim Guru Informatika' : 'Siswa')}</p>
+                <p className="text-sm font-bold text-on-surface truncate">{user?.name && user.name !== '0987654321' && user.name !== 'guruinformatika' ? user.name : (user?.role === 'guru' ? 'Tim Guru Informatika' : 'Siswa')}</p>
                 <p className="text-xs text-on-surface-variant truncate">{user?.role === 'guru' ? (user?.class_name ? `Guru Kelas ${user.class_name}` : 'Koordinator Guru') : user?.identifier_no}</p>
               </div>
               <button 

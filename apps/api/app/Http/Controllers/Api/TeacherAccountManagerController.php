@@ -29,7 +29,7 @@ class TeacherAccountManagerController extends Controller
         $today = now()->startOfDay();
 
         $teachers = User::where('role', 'guru')
-            ->orderByRaw("CASE WHEN identifier_no = '0987654321' OR class_name IS NULL THEN 0 ELSE 1 END, class_name ASC")
+            ->orderByRaw("CASE WHEN identifier_no = 'guruinformatika' OR class_name IS NULL THEN 0 ELSE 1 END, class_name ASC")
             ->get()
             ->map(function ($teacher) use ($today) {
                 // Presence detection
@@ -49,7 +49,7 @@ class TeacherAccountManagerController extends Controller
                     'name' => $teacher->name,
                     'identifier_no' => $teacher->identifier_no,
                     'class_name' => $teacher->class_name,
-                    'is_coordinator' => empty($teacher->class_name) || $teacher->identifier_no === '0987654321',
+                    'is_coordinator' => empty($teacher->class_name) || $teacher->identifier_no === 'guruinformatika',
                     'role' => $teacher->role,
                     'avatar_url' => $teacher->avatar_url,
                     'is_active' => $teacher->is_active,
@@ -91,7 +91,7 @@ class TeacherAccountManagerController extends Controller
             }
         }
 
-        $password = !empty($validated['password']) ? $validated['password'] : 'password123';
+        $password = !empty($validated['password']) ? $validated['password'] : 'guruinformatika123';
 
         $teacher = User::create([
             'name' => $validated['name'],
@@ -148,11 +148,11 @@ class TeacherAccountManagerController extends Controller
         $this->authorizeKoordinator($request);
 
         $teacher = User::where('role', 'guru')->findOrFail($id);
-        $teacher->password = Hash::make('password123');
+        $teacher->password = Hash::make('guruinformatika123');
         $teacher->save();
 
         return response()->json([
-            'message' => 'Kata sandi ' . $teacher->name . ' berhasil direset ke "password123"'
+            'message' => 'Kata sandi ' . $teacher->name . ' berhasil direset ke "guruinformatika123"'
         ]);
     }
 
@@ -162,7 +162,7 @@ class TeacherAccountManagerController extends Controller
 
         $teacher = User::where('role', 'guru')->findOrFail($id);
         
-        if ($teacher->identifier_no === '0987654321') {
+        if ($teacher->identifier_no === 'guruinformatika' || $teacher->identifier_no === '0987654321') {
             return response()->json([
                 'message' => 'Akun Koordinator Utama tidak dapat dihapus.'
             ], 422);
@@ -181,9 +181,10 @@ class TeacherAccountManagerController extends Controller
     {
         $this->authorizeKoordinator($request);
         
-        // Perbaiki koordinator jika namanya angka
-        $coord = User::where('identifier_no', '0987654321')->first();
+        // Perbaiki koordinator jika masih memakai identifier lama
+        $coord = User::whereIn('identifier_no', ['guruinformatika', '0987654321'])->first();
         if ($coord) {
+            $coord->identifier_no = 'guruinformatika';
             $coord->name = 'Tim Guru Informatika (Koordinator)';
             $coord->class_name = null;
             $coord->save();

@@ -135,7 +135,7 @@ export default function TeacherStudentManagerPage() {
   const resetPassword = async (id: number, name: string) => {
     Swal.fire({
       title: 'Reset Password?',
-      text: `Yakin ingin mereset password akun ${name} menjadi "spengu123"?`,
+      text: `Yakin ingin mereset password akun ${name} menjadi "spentigu123"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -146,7 +146,7 @@ export default function TeacherStudentManagerPage() {
       if (result.isConfirmed) {
         try {
           await api.post(`/api/teacher/students/${id}/reset-password`);
-          Swal.fire('Sukses', `Berhasil! Password ${name} diubah kembali ke default (spengu123)`, 'success');
+          Swal.fire('Sukses', `Berhasil! Password ${name} diubah kembali ke default (spentigu123)`, 'success');
         } catch (e) {
           Swal.fire('Gagal', 'Gagal mereset password', 'error');
         }

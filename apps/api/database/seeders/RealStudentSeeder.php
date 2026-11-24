@@ -154,10 +154,11 @@ class RealStudentSeeder extends Seeder
                 ['identifier_no' => $student['induk']],
                 [
                     'name' => ucwords(strtolower($student['name'])),
-                    'password' => Hash::make('spengu123'),
-                    'role' => 'siswa', // changed to 'siswa' instead of 'student'
+                    'password' => Hash::make('spentigu123'),
+                    'role' => 'siswa',
                     'class_name' => $student['class'],
                     'attendance_number' => $student['absen'],
+                    'is_active' => true,
                 ]
             );
         }

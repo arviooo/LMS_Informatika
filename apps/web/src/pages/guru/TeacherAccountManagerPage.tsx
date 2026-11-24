@@ -38,7 +38,7 @@ export default function TeacherAccountManagerPage() {
     name: '',
     class_name: 'VII A',
     identifier_no: '',
-    password: 'password123'
+    password: 'guruinformatika123'
   });
 
   const tabOptions = ['Semua Guru', 'Koordinator', 'VII A', 'VII B', 'VII C', 'VII D'];
@@ -78,7 +78,7 @@ export default function TeacherAccountManagerPage() {
       name: '',
       class_name: 'VII A',
       identifier_no: 'guru_viia',
-      password: 'password123'
+      password: 'guruinformatika123'
     });
     setIsCustomClass(false);
     setCustomClass('');
@@ -130,7 +130,7 @@ export default function TeacherAccountManagerPage() {
       setCustomClass(currentClass);
     }
     setFormData({
-      name: t.name && t.name !== '0987654321' ? t.name : 'Tim Guru Informatika (Koordinator)',
+      name: t.name && t.name !== '0987654321' && t.name !== 'guruinformatika' ? t.name : 'Tim Guru Informatika (Koordinator)',
       class_name: currentClass,
       identifier_no: t.identifier_no || '',
       password: ''
@@ -188,7 +188,7 @@ export default function TeacherAccountManagerPage() {
   const handleResetPassword = async (t: TeacherItem) => {
     const result = await Swal.fire({
       title: `Reset Sandi Akun?`,
-      html: `Kata sandi akun <b>${t.name}</b> (${t.class_name || 'Koordinator'}) akan direset ke default: <code>password123</code>`,
+      html: `Kata sandi akun <b>${t.name}</b> (${t.class_name || 'Koordinator'}) akan direset ke default: <code>guruinformatika123</code>`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -211,7 +211,7 @@ export default function TeacherAccountManagerPage() {
   };
 
   const handleDeleteTeacher = async (t: TeacherItem) => {
-    if (t.identifier_no === '0987654321') {
+    if (t.identifier_no === 'guruinformatika' || t.identifier_no === '0987654321') {
       Swal.fire('Pemberitahuan', 'Akun Koordinator Utama tidak dapat dihapus.', 'info');
       return;
     }
@@ -244,7 +244,7 @@ export default function TeacherAccountManagerPage() {
   const handleAutoGenerate = async () => {
     const result = await Swal.fire({
       title: 'Sinkronkan Otomatis Akun VII A - VII D?',
-      text: 'Sistem akan otomatis memastikan akun guru pengampu (VII A, VII B, VII C, VII D, dan Koordinator) aktif di database dengan password default: "password123".',
+      text: 'Sistem akan otomatis memastikan akun guru pengampu (VII A, VII B, VII C, VII D, dan Koordinator) aktif di database dengan password default: "guruinformatika123".',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -439,7 +439,7 @@ export default function TeacherAccountManagerPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 w-full min-w-0">
             {filteredTeachers.map((t) => {
-              const displayName = t.name && t.name !== '0987654321' ? t.name : (t.is_coordinator ? 'Tim Guru Informatika (Koordinator)' : t.name);
+              const displayName = t.name && t.name !== '0987654321' && t.name !== 'guruinformatika' ? t.name : (t.is_coordinator ? 'Tim Guru Informatika (Koordinator)' : t.name);
               const avatarChar = displayName.charAt(0).toUpperCase();
 
               return (
@@ -516,7 +516,7 @@ export default function TeacherAccountManagerPage() {
                       onClick={() => handleResetPassword(t)}
                       disabled={actionLoading}
                       className="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-primary hover:bg-primary-fixed/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                      title="Reset kata sandi ke password123"
+                      title="Reset kata sandi ke guruinformatika123"
                     >
                       <Icon name="key" className="text-[15px]" />
                       <span>Reset Sandi</span>
@@ -533,7 +533,7 @@ export default function TeacherAccountManagerPage() {
                         <span>Edit</span>
                       </button>
 
-                      {t.identifier_no !== '0987654321' && (
+                      {t.identifier_no !== 'guruinformatika' && t.identifier_no !== '0987654321' && (
                         <button
                           onClick={() => handleDeleteTeacher(t)}
                           disabled={actionLoading}
@@ -651,11 +651,11 @@ export default function TeacherAccountManagerPage() {
                   type="text"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Default: password123"
+                  placeholder="Default: guruinformatika123"
                   className="w-full bg-surface-container-lowest border border-outline rounded-xl px-4 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
                 <p className="text-[11px] text-on-surface-variant">
-                  Default otomatis: <code>password123</code>
+                  Default otomatis: <code>guruinformatika123</code>
                 </p>
               </div>
 
