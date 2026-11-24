@@ -73,7 +73,7 @@ Route::get('/{any}', function ($any, Request $request) use ($serveSpaIndex) {
         if ($ext === 'txt') $headers['Content-Type'] = 'text/plain; charset=UTF-8';
         if ($ext === 'apk') {
             $headers['Content-Type'] = 'application/vnd.android.package-archive';
-            $headers['Content-Disposition'] = 'attachment; filename="LMS_Informatika.apk"';
+            $headers['Content-Disposition'] = 'attachment; filename="' . basename($resolvedPublic) . '"';
         }
 
         return response()->file($resolvedPublic, $headers);

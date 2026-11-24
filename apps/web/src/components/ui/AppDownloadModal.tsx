@@ -44,7 +44,7 @@ export async function downloadApkSafely(
   onProgress?: (percent: number, loadedMB: string, totalMB: string) => void
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch('/LMS_Informatika.apk?v=3', {
+    const response = await fetch('/LMS_RuangInfo.apk?v=4', {
       method: 'GET',
       credentials: 'include',
       cache: 'no-store',
@@ -65,7 +65,7 @@ export async function downloadApkSafely(
       };
     }
 
-    const contentLength = Number(response.headers.get('content-length')) || 7512336;
+    const contentLength = Number(response.headers.get('content-length')) || 7515360;
     const totalMB = (contentLength / (1024 * 1024)).toFixed(1);
 
     let blob: Blob;
@@ -112,7 +112,7 @@ export async function downloadApkSafely(
     const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = blobUrl;
-    link.download = 'LMS_Informatika.apk';
+    link.download = 'LMS_RuangInfo.apk';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -334,7 +334,7 @@ export default function AppDownloadModal({ isOpen, onClose, autoTriggered = fals
             <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-700 text-xs flex items-center gap-2 animate-in fade-in">
               <Icon name="check_circle" className="text-[18px] shrink-0 text-emerald-600" />
               <span>
-                File <b>LMS_Informatika.apk</b> ({downloadProgress.totalMB} MB) berhasil diunduh! Buka notifikasi unduhan HP untuk memasang.
+                File <b>LMS_RuangInfo.apk</b> ({downloadProgress.totalMB} MB) berhasil diunduh! Buka notifikasi unduhan HP untuk memasang.
               </span>
             </div>
           )}
@@ -385,7 +385,7 @@ export default function AppDownloadModal({ isOpen, onClose, autoTriggered = fals
                   3
                 </span>
                 <p>
-                  Buka file <b>LMS_Informatika.apk</b> dari notifikasi unduhan atau folder <b>Download</b> di HP.
+                  Buka file <b>LMS_RuangInfo.apk</b> dari notifikasi unduhan atau folder <b>Download</b> di HP.
                 </p>
               </div>
               <div className="flex gap-2">
