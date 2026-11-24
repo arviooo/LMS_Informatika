@@ -105,26 +105,30 @@ Route::middleware(['auth:sanctum'])->prefix('teacher')->group(function () {
 Route::get('/teacher/grades/download', [TeacherStudentController::class, 'downloadGradesCsv']);
 
 
-// Serve storage files directly via API to bypass InfinityFree .htaccess issues & symlink limitations
+// Serve storage files directly via API (safe against path traversal & dotfile leaks)
 Route::get('/storage/{path}', function ($path) {
-    $locations = [
-        storage_path('app/public/' . $path),
-        public_path('storage/' . $path),
-        base_path('storage/app/public/' . $path),
-        base_path('public/storage/' . $path),
-    ];
+    $normalized = ltrim(str_replace('\\', '/', $path), '/');
+    if (str_contains($normalized, '..') || preg_match('#(^|/)\.#', $normalized)) {
+        abort(404);
+    }
 
-    foreach ($locations as $loc) {
-        if (file_exists($loc) && !is_dir($loc)) {
-            $mime = @mime_content_type($loc) ?: 'application/octet-stream';
-            return response()->file($loc, [
+    $baseDirs = array_filter([
+        realpath(storage_path('app/public')),
+        realpath(public_path('storage')),
+    ]);
+
+    foreach ($baseDirs as $baseDir) {
+        $resolved = realpath($baseDir . DIRECTORY_SEPARATOR . $normalized);
+        if ($resolved && str_starts_with($resolved, $baseDir . DIRECTORY_SEPARATOR) && is_file($resolved)) {
+            $mime = @mime_content_type($resolved) ?: 'application/octet-stream';
+            return response()->file($resolved, [
                 'Content-Type' => $mime,
-                'Content-Disposition' => 'inline; filename="' . basename($loc) . '"',
+                'Content-Disposition' => 'inline; filename="' . basename($resolved) . '"',
                 'Access-Control-Allow-Origin' => '*',
                 'Cache-Control' => 'public, max-age=86400',
             ]);
         }
     }
 
-    abort(404, 'File tidak ditemukan di server: ' . $path);
+    abort(404, 'File tidak ditemukan di server.');
 })->where('path', '.*');

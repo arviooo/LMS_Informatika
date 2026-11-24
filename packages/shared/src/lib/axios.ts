@@ -1,12 +1,16 @@
 import axios from 'axios';
 
-// Get the current hostname where the React app is served (e.g., 'localhost' or 'ruanginfo.ct.ws')
+// Get the current hostname where the React app is served (e.g., 'localhost' or 'siruanginfo.my.id')
 const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-const isProductionDomain = hostname.includes('ruanginfo.ct.ws');
+const isLocalDev =
+  hostname === 'localhost' ||
+  hostname === '127.0.0.1' ||
+  hostname.startsWith('192.168.') ||
+  hostname.startsWith('10.');
 
-// If accessed on the production domain, always match window.location.origin to prevent cross-origin/mixed-content issues
-export const backendUrl = isProductionDomain 
-  ? window.location.origin 
+// On production domains (e.g., siruanginfo.my.id), always match window.location.origin to prevent cross-origin/mixed-content issues
+export const backendUrl = !isLocalDev
+  ? window.location.origin
   : (import.meta.env.VITE_API_URL || `http://${hostname}:8000`);
 
 export const formatStorageUrl = (urlOrPath?: string | null): string => {
