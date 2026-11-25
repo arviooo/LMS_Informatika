@@ -31,11 +31,12 @@ class MaterialController extends Controller
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $fileName = 'material_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $file->getClientOriginalExtension();
-            $dir = base_path('materials');
-            if (!file_exists($dir)) mkdir($dir, 0755, true);
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'bin');
+            $fileName = 'material_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $ext;
+            $dir = storage_path('app/public/materials');
+            if (!is_dir($dir)) @mkdir($dir, 0775, true);
             $file->move($dir, $fileName);
-            $validated['attachment_path'] = '/materials/' . $fileName;
+            $validated['attachment_path'] = '/api/storage/materials/' . $fileName;
         }
 
         $material = Material::create($validated);
@@ -67,15 +68,18 @@ class MaterialController extends Controller
 
         if ($request->hasFile('attachment')) {
             if ($material->attachment_path) {
-                $oldFile = base_path(ltrim(parse_url($material->attachment_path, PHP_URL_PATH), '/'));
-                if (file_exists($oldFile) && !is_dir($oldFile)) @unlink($oldFile);
+                $oldRel = ltrim(preg_replace('#^/api/storage/#', '', parse_url($material->attachment_path, PHP_URL_PATH) ?: ''), '/');
+                foreach ([storage_path('app/public/' . $oldRel), base_path($oldRel)] as $oldFile) {
+                    if (file_exists($oldFile) && !is_dir($oldFile)) @unlink($oldFile);
+                }
             }
             $file = $request->file('attachment');
-            $fileName = 'material_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $file->getClientOriginalExtension();
-            $dir = base_path('materials');
-            if (!file_exists($dir)) mkdir($dir, 0755, true);
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'bin');
+            $fileName = 'material_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $ext;
+            $dir = storage_path('app/public/materials');
+            if (!is_dir($dir)) @mkdir($dir, 0775, true);
             $file->move($dir, $fileName);
-            $validated['attachment_path'] = '/materials/' . $fileName;
+            $validated['attachment_path'] = '/api/storage/materials/' . $fileName;
         }
 
         $material->update($validated);

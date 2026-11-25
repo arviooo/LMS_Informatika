@@ -53,21 +53,24 @@ class TeacherDashboardController extends Controller
         $user = $request->user();
         
         if ($user->avatar_url) {
-            $oldFile = base_path(ltrim($user->avatar_url, '/'));
-            if (file_exists($oldFile) && !is_dir($oldFile)) {
-                @unlink($oldFile);
+            $oldRel = ltrim(preg_replace('#^/api/storage/#', '', $user->avatar_url), '/');
+            foreach ([storage_path('app/public/' . $oldRel), base_path($oldRel)] as $oldFile) {
+                if (file_exists($oldFile) && !is_dir($oldFile)) {
+                    @unlink($oldFile);
+                }
             }
         }
 
         $photo = $request->file('photo');
-        $fileName = 'avatar_teacher_' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
-        $avatarsPath = base_path('avatars');
-        if (!file_exists($avatarsPath)) {
-            mkdir($avatarsPath, 0755, true);
+        $ext = strtolower($photo->getClientOriginalExtension() ?: 'jpg');
+        $fileName = 'avatar_teacher_' . $user->id . '_' . time() . '.' . $ext;
+        $avatarsPath = storage_path('app/public/avatars');
+        if (!is_dir($avatarsPath)) {
+            @mkdir($avatarsPath, 0775, true);
         }
         $photo->move($avatarsPath, $fileName);
 
-        $user->avatar_url = '/avatars/' . $fileName;
+        $user->avatar_url = '/api/storage/avatars/' . $fileName;
         $user->save();
 
         return response()->json(['message' => 'Foto berhasil diperbarui', 'avatar_url' => $user->avatar_url]);

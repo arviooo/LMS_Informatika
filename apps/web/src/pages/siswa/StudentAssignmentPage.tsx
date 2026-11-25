@@ -108,11 +108,7 @@ export default function StudentAssignmentPage() {
         formData.append('student_note', note);
       }
       
-      await api.post(`/api/student/assignments/${id}/submit`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await api.post(`/api/student/assignments/${id}/submit`, formData);
       
       setIsSuccess(true);
       localStorage.removeItem(`draft_note_${id}`); // clear draft after submit
@@ -120,9 +116,13 @@ export default function StudentAssignmentPage() {
         await Swal.fire('Sukses', 'Tugas Berhasil Terkumpul!', 'success');
         window.location.reload(); // refresh to see the preview
       }, 1500);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting:', error);
-      await Swal.fire('Gagal', 'Gagal mengumpulkan tugas.', 'error');
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.file?.[0] ||
+        'Gagal mengumpulkan tugas.';
+      await Swal.fire('Gagal', errMsg, 'error');
     } finally {
       setIsSubmitting(false);
     }

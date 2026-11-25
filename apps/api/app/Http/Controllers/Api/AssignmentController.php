@@ -80,11 +80,12 @@ class AssignmentController extends Controller
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $fileName = 'assignment_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $file->getClientOriginalExtension();
-            $dir = base_path('assignments');
-            if (!file_exists($dir)) mkdir($dir, 0755, true);
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'bin');
+            $fileName = 'assignment_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $ext;
+            $dir = storage_path('app/public/assignments');
+            if (!is_dir($dir)) @mkdir($dir, 0775, true);
             $file->move($dir, $fileName);
-            $attachmentPath = '/assignments/' . $fileName;
+            $attachmentPath = 'assignments/' . $fileName;
         }
 
         $assignment = Assignment::create([
@@ -120,15 +121,18 @@ class AssignmentController extends Controller
 
         if ($request->hasFile('attachment')) {
             if ($assignment->attachment_path) {
-                $oldFile = base_path(ltrim($assignment->attachment_path, '/'));
-                if (file_exists($oldFile) && !is_dir($oldFile)) @unlink($oldFile);
+                $cleanOld = ltrim($assignment->attachment_path, '/');
+                foreach ([storage_path('app/public/' . $cleanOld), base_path($cleanOld)] as $oldFile) {
+                    if (file_exists($oldFile) && !is_dir($oldFile)) @unlink($oldFile);
+                }
             }
             $file = $request->file('attachment');
-            $fileName = 'assignment_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $file->getClientOriginalExtension();
-            $dir = base_path('assignments');
-            if (!file_exists($dir)) mkdir($dir, 0755, true);
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'bin');
+            $fileName = 'assignment_' . time() . '_' . \Illuminate\Support\Str::random(5) . '.' . $ext;
+            $dir = storage_path('app/public/assignments');
+            if (!is_dir($dir)) @mkdir($dir, 0775, true);
             $file->move($dir, $fileName);
-            $assignment->attachment_path = '/assignments/' . $fileName;
+            $assignment->attachment_path = 'assignments/' . $fileName;
         }
 
         $assignment->update([
@@ -232,15 +236,15 @@ class AssignmentController extends Controller
 
         // Convert assignment to array and append full URL for attachment
         $assignmentData = $assignment->toArray();
-        if ($assignmentData['attachment_path']) {
-            $assignmentData['attachment_url'] = url('/api/storage/' . $assignmentData['attachment_path']);
+        if (!empty($assignmentData['attachment_path'])) {
+            $assignmentData['attachment_url'] = url('/api/storage/' . ltrim($assignmentData['attachment_path'], '/'));
         }
 
         $submissionData = null;
         if ($submission) {
             $submissionData = $submission->toArray();
-            if ($submissionData['file_path']) {
-                $submissionData['file_url'] = url('/api/storage/' . $submissionData['file_path']);
+            if (!empty($submissionData['file_path'])) {
+                $submissionData['file_url'] = url('/api/storage/' . ltrim($submissionData['file_path'], '/'));
             }
         }
 
@@ -253,9 +257,18 @@ class AssignmentController extends Controller
     public function submit(Request $request, $id)
     {
         $request->validate([
-            'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:15360', // 15MB
+            'file' => 'required|file|max:15360', // 15MB
             'student_note' => 'nullable|string'
         ]);
+
+        $file = $request->file('file');
+        $ext = strtolower($file->getClientOriginalExtension() ?: '');
+        $allowedExts = ['pdf', 'png', 'jpg', 'jpeg', 'webp'];
+        if (!in_array($ext, $allowedExts, true)) {
+            return response()->json([
+                'message' => 'Format file tidak didukung. Gunakan file PDF, JPG, atau PNG.'
+            ], 422);
+        }
 
         $assignment = Assignment::findOrFail($id);
         $userId = $request->user()->id;
@@ -264,12 +277,33 @@ class AssignmentController extends Controller
             ->where('user_id', $userId)
             ->first();
 
-        $filePath = $request->file('file')->store('submissions', 'public');
+        try {
+            $dir = storage_path('app/public/submissions');
+            if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+                throw new \RuntimeException('Gagal membuat folder penyimpanan tugas di server.');
+            }
+
+            $fileName = 'sub_' . $assignment->id . '_' . $userId . '_' . time() . '_' . \Illuminate\Support\Str::random(6) . '.' . $ext;
+            $file->move($dir, $fileName);
+            $filePath = 'submissions/' . $fileName;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Assignment submission upload failed', [
+                'assignment_id' => $id,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'message' => 'Gagal menyimpan file tugas di server. Pastikan folder storage dapat ditulis.'
+            ], 500);
+        }
 
         if ($submission) {
-            // Update existing submission
             if ($submission->file_path) {
-                Storage::disk('public')->delete($submission->file_path);
+                $oldFile = storage_path('app/public/' . ltrim($submission->file_path, '/'));
+                if (file_exists($oldFile) && !is_dir($oldFile)) {
+                    @unlink($oldFile);
+                }
             }
             $submission->update([
                 'file_path' => $filePath,
@@ -277,7 +311,6 @@ class AssignmentController extends Controller
                 'submitted_at' => now(),
             ]);
         } else {
-            // Create new submission
             $submission = AssignmentSubmission::create([
                 'assignment_id' => $assignment->id,
                 'user_id' => $userId,
@@ -287,9 +320,12 @@ class AssignmentController extends Controller
             ]);
         }
 
+        $submissionData = $submission->toArray();
+        $submissionData['file_url'] = url('/api/storage/' . ltrim($filePath, '/'));
+
         return response()->json([
             'message' => 'Submission successful',
-            'submission' => $submission
+            'submission' => $submissionData
         ]);
     }
 }
