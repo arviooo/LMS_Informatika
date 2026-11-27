@@ -24,14 +24,7 @@ Route::middleware(['auth:sanctum'])->prefix('student')->group(function () {
     Route::get('/topics', [StudentController::class, 'getTopics']);
     Route::get('/class-setting', function(Request $request) {
         $user = $request->user();
-        if (!$user->class_name) {
-            return response()->json(['homeroom_teacher' => '-', 'informatics_teacher' => '-']);
-        }
-        $setting = \App\Models\ClassSetting::where('class_name', $user->class_name)->first();
-        return response()->json($setting ?: [
-            'homeroom_teacher' => 'Bpk. Haryanto, S.Kom.',
-            'informatics_teacher' => 'Bpk. Haryanto, S.Kom.',
-        ]);
+        return response()->json(ClassSettingController::resolveForClass($user?->class_name));
     });
     Route::get('/materials/{id}', [StudentController::class, 'getMaterial']);
     Route::post('/materials/{id}/progress', [StudentController::class, 'markProgress']);

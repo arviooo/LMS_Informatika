@@ -91,6 +91,8 @@ export default function TeacherGradebookPage() {
   const [loading, setLoading] = useState(true);
   const [activeClass, setActiveClass] = useState(currentUser?.class_name || 'VII A');
   const [classSetting, setClassSetting] = useState({ homeroom_teacher: '', informatics_teacher: '' });
+  const [isEditingClassSetting, setIsEditingClassSetting] = useState(false);
+  const [savingClassSetting, setSavingClassSetting] = useState(false);
 
   // Filter, Search & Sort states
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,6 +103,7 @@ export default function TeacherGradebookPage() {
 
   useEffect(() => {
     fetchGrades();
+    setIsEditingClassSetting(false);
     if (activeClass !== 'Semua Kelas') {
       fetchClassSetting();
     } else {
@@ -112,9 +115,42 @@ export default function TeacherGradebookPage() {
   const fetchClassSetting = async () => {
     try {
       const res = await api.get(`/api/teacher/class-settings/${encodeURIComponent(activeClass)}`);
-      setClassSetting(res.data || { homeroom_teacher: '', informatics_teacher: '' });
+      setClassSetting({
+        homeroom_teacher: res.data?.homeroom_teacher || '',
+        informatics_teacher: res.data?.informatics_teacher || '',
+      });
     } catch (error) {
       console.error('Failed to fetch class setting', error);
+    }
+  };
+
+  const handleSaveClassSetting = async () => {
+    if (!classSetting.homeroom_teacher.trim() || !classSetting.informatics_teacher.trim()) {
+      Swal.fire('Perhatian', 'Nama Wali Kelas dan Guru Mapel tidak boleh kosong.', 'warning');
+      return;
+    }
+    setSavingClassSetting(true);
+    try {
+      const res = await api.post(`/api/teacher/class-settings/${encodeURIComponent(activeClass)}`, {
+        homeroom_teacher: classSetting.homeroom_teacher.trim(),
+        informatics_teacher: classSetting.informatics_teacher.trim(),
+      });
+      setClassSetting({
+        homeroom_teacher: res.data?.homeroom_teacher || classSetting.homeroom_teacher.trim(),
+        informatics_teacher: res.data?.informatics_teacher || classSetting.informatics_teacher.trim(),
+      });
+      setIsEditingClassSetting(false);
+      Swal.fire({
+        icon: 'success',
+        title: 'Tersimpan!',
+        text: `Data Wali Kelas & Guru Mapel ${activeClass} berhasil diperbarui.`,
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error: any) {
+      Swal.fire('Gagal', error?.response?.data?.message || 'Gagal menyimpan pengaturan kelas.', 'error');
+    } finally {
+      setSavingClassSetting(false);
     }
   };
 
@@ -471,20 +507,75 @@ export default function TeacherGradebookPage() {
             </div>
           </div>
 
-          {/* Info Wali Kelas & Guru Informatika (1 baris ringkas saja) */}
-          {activeClass !== 'Semua Kelas' && (classSetting.homeroom_teacher || classSetting.informatics_teacher) && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 border-t border-slate-100 text-[11px] text-slate-600">
-              {classSetting.homeroom_teacher && (
-                <span className="inline-flex items-center gap-1">
-                  <Icon name="person" className="text-[14px] text-blue-600" />
-                  Wali Kelas: <strong className="text-slate-800">{classSetting.homeroom_teacher}</strong>
-                </span>
-              )}
-              {classSetting.informatics_teacher && (
-                <span className="inline-flex items-center gap-1">
-                  <Icon name="school" className="text-[14px] text-emerald-600" />
-                  Guru Mapel: <strong className="text-slate-800">{classSetting.informatics_teacher}</strong>
-                </span>
+          {/* Info Wali Kelas & Guru Informatika (dinamis dari database + bisa langsung diubah) */}
+          {activeClass !== 'Semua Kelas' && (
+            <div className="pt-2 border-t border-slate-100">
+              {isEditingClassSetting ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 text-xs">
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1">Wali Kelas {activeClass}</label>
+                    <input
+                      type="text"
+                      value={classSetting.homeroom_teacher}
+                      onChange={(e) => setClassSetting({ ...classSetting, homeroom_teacher: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                      placeholder="Nama Wali Kelas"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1">Guru Mapel Informatika</label>
+                    <input
+                      type="text"
+                      value={classSetting.informatics_teacher}
+                      onChange={(e) => setClassSetting({ ...classSetting, informatics_teacher: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+                      placeholder="Nama Guru Mapel"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      disabled={savingClassSetting}
+                      onClick={handleSaveClassSetting}
+                      className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs disabled:opacity-60"
+                    >
+                      {savingClassSetting ? 'Menyimpan...' : 'Simpan'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={savingClassSetting}
+                      onClick={() => {
+                        setIsEditingClassSetting(false);
+                        fetchClassSetting();
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <span className="inline-flex items-center gap-1">
+                      <Icon name="person" className="text-[14px] text-blue-600" />
+                      Wali Kelas: <strong className="text-slate-800">{classSetting.homeroom_teacher || '-'}</strong>
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Icon name="school" className="text-[14px] text-emerald-600" />
+                      Guru Mapel: <strong className="text-slate-800">{classSetting.informatics_teacher || '-'}</strong>
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingClassSetting(true)}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold text-blue-600 hover:bg-blue-50 transition-colors"
+                    title="Ubah Wali Kelas & Guru Mapel"
+                  >
+                    <Icon name="edit" className="text-[13px]" />
+                    <span>Edit</span>
+                  </button>
+                </div>
               )}
             </div>
           )}
