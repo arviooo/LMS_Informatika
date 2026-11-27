@@ -20,7 +20,7 @@ class MaterialController extends Controller
             'topic_id' => 'required|exists:topics,id',
             'title' => 'required|string|max:200',
             'content_text' => 'required|string',
-            'youtube_video_id' => 'nullable|string|max:20',
+            'youtube_video_id' => 'nullable|string|max:255',
             'attachment_path' => 'nullable|string|max:255',
             'estimated_read_time' => 'required|integer',
             'order_number' => 'required|integer',
@@ -28,6 +28,10 @@ class MaterialController extends Controller
             'target_classes' => 'nullable|array',
             'target_classes.*' => 'string'
         ]);
+
+        if (array_key_exists('youtube_video_id', $validated)) {
+            $validated['youtube_video_id'] = $this->normalizeYoutubeId($validated['youtube_video_id']);
+        }
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
@@ -57,7 +61,7 @@ class MaterialController extends Controller
             'topic_id' => 'exists:topics,id',
             'title' => 'string|max:200',
             'content_text' => 'string',
-            'youtube_video_id' => 'nullable|string|max:20',
+            'youtube_video_id' => 'nullable|string|max:255',
             'attachment_path' => 'nullable|string|max:255',
             'estimated_read_time' => 'integer',
             'order_number' => 'integer',
@@ -65,6 +69,10 @@ class MaterialController extends Controller
             'target_classes' => 'nullable|array',
             'target_classes.*' => 'string'
         ]);
+
+        if (array_key_exists('youtube_video_id', $validated)) {
+            $validated['youtube_video_id'] = $this->normalizeYoutubeId($validated['youtube_video_id']);
+        }
 
         if ($request->hasFile('attachment')) {
             if ($material->attachment_path) {
@@ -91,5 +99,23 @@ class MaterialController extends Controller
         $material = Material::findOrFail($id);
         $material->delete();
         return response()->json(null, 204);
+    }
+
+    private function normalizeYoutubeId(?string $raw): ?string
+    {
+        if (!$raw) {
+            return null;
+        }
+        $trimmed = trim($raw);
+        if ($trimmed === '') {
+            return null;
+        }
+        if (preg_match('/^[a-zA-Z0-9_-]{11}$/', $trimmed)) {
+            return $trimmed;
+        }
+        if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/', $trimmed, $m)) {
+            return $m[1];
+        }
+        return substr($trimmed, 0, 20);
     }
 }

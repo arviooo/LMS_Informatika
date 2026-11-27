@@ -137,8 +137,52 @@ export default function MaterialFormPage() {
     }
   };
 
+  const extractYoutubeVideoId = (input: string): string => {
+    const trimmed = input.trim();
+    if (!trimmed) return '';
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+
+    try {
+      const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      const url = new URL(withProto);
+      const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+
+      if (host === 'youtu.be') {
+        const seg = url.pathname.split('/').filter(Boolean)[0] || '';
+        if (/^[a-zA-Z0-9_-]{11}$/.test(seg)) return seg;
+      }
+
+      if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
+        const vParam = url.searchParams.get('v');
+        if (vParam && /^[a-zA-Z0-9_-]{11}$/.test(vParam)) return vParam;
+
+        const parts = url.pathname.split('/').filter(Boolean);
+        if (['embed', 'shorts', 'live', 'v'].includes(parts[0]) && parts[1] && /^[a-zA-Z0-9_-]{11}$/.test(parts[1])) {
+          return parts[1];
+        }
+      }
+    } catch {
+      // Fallback regex below
+    }
+
+    const regexMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
+    if (regexMatch) return regexMatch[1];
+
+    return trimmed;
+  };
+
   const handleSubmit = async (e: React.FormEvent, status: 'draft' | 'published') => {
     e.preventDefault();
+    const cleanedYoutubeId = extractYoutubeVideoId(formData.youtube_video_id);
+    if (cleanedYoutubeId && !/^[a-zA-Z0-9_-]{11}$/.test(cleanedYoutubeId)) {
+      Swal.fire(
+        'Link / ID YouTube Tidak Valid',
+        'ID Video YouTube harus tepat 11 karakter (bukan kode setelah ?si=). Tempel langsung link YouTube penuh agar otomatis terdeteksi.',
+        'warning'
+      );
+      return;
+    }
+
     setIsSaving(true);
     try {
       // 1. Save Material
@@ -148,9 +192,7 @@ export default function MaterialFormPage() {
       fd.append('content_text', formData.content_text);
       fd.append('estimated_read_time', formData.estimated_read_time.toString());
       fd.append('order_number', formData.order_number.toString());
-      if (formData.youtube_video_id) {
-        fd.append('youtube_video_id', formData.youtube_video_id);
-      }
+      fd.append('youtube_video_id', cleanedYoutubeId);
       if (selectedFile) {
         fd.append('attachment', selectedFile);
       }
@@ -381,19 +423,41 @@ export default function MaterialFormPage() {
               </div>
               
               <div className="flex flex-col space-y-2 pb-4 border-b border-surface-variant/20">
-                <label className="text-sm text-on-surface-variant font-bold">ID Video YouTube (Opsional)</label>
+                <label className="text-sm text-on-surface-variant font-bold">Link atau ID Video YouTube (Opsional)</label>
                 <div className="flex items-center gap-2">
-                  <span className="bg-surface-container-high px-3 h-12 rounded-xl flex items-center justify-center text-sm font-medium text-on-surface-variant border border-transparent">
-                    youtube.com/watch?v=
+                  <span className="bg-surface-container-high px-3 h-12 rounded-xl flex items-center justify-center text-sm font-medium text-on-surface-variant border border-transparent shrink-0">
+                    YouTube
                   </span>
                   <input 
                     type="text" 
                     value={formData.youtube_video_id}
-                    onChange={e => setFormData({...formData, youtube_video_id: e.target.value})}
+                    onChange={e => {
+                      const extracted = extractYoutubeVideoId(e.target.value);
+                      setFormData({...formData, youtube_video_id: extracted});
+                    }}
                     className="flex-1 h-12 px-4 bg-surface-container-low rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium" 
-                    placeholder="Contoh: dQw4w9WgXcQ" 
+                    placeholder="Tempel link YouTube penuh (youtu.be/... atau youtube.com/watch?v=...) atau 11 digit ID" 
                   />
                 </div>
+                {formData.youtube_video_id.trim() !== '' && (
+                  /^[a-zA-Z0-9_-]{11}$/.test(formData.youtube_video_id.trim()) ? (
+                    <div className="flex items-center gap-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
+                      <img
+                        src={`https://img.youtube.com/vi/${formData.youtube_video_id.trim()}/hqdefault.jpg`}
+                        alt="Pratinjau Thumbnail YouTube"
+                        className="w-20 h-12 rounded-lg object-cover bg-black shrink-0"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-bold">ID Video YouTube valid: <code>{formData.youtube_video_id.trim()}</code></span>
+                        <span className="text-emerald-700/80">Video siap diputar oleh siswa.</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                      Format ID belum valid (harus 11 karakter, bukan kode setelah <code>?si=</code>). Tempel saja langsung link YouTube penuhnya di kolom di atas.
+                    </p>
+                  )
+                )}
               </div>
 
               <label className="bg-surface-container-low rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer transition-colors hover:bg-surface-container-highest border-2 border-dashed border-outline-variant/60">

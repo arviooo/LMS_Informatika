@@ -111,6 +111,15 @@ export default function StudentMaterialContentPage() {
 
   const fileType = getFileType(material.attachment_path);
 
+  const extractYoutubeId = (raw?: string | null): string | null => {
+    if (!raw) return null;
+    const trimmed = raw.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+    const m = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : null;
+  };
+  const validYoutubeId = extractYoutubeId(material.youtube_video_id);
+
   return (
     <>
     <div className="min-h-screen bg-[#FFFDF8]">
@@ -160,7 +169,7 @@ export default function StudentMaterialContentPage() {
               </div>
 
               {/* Facade Video Player */}
-              {material.youtube_video_id && (
+              {validYoutubeId && (
                 <section className="flex flex-col gap-2 mt-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
@@ -186,10 +195,11 @@ export default function StudentMaterialContentPage() {
                       >
                         <img 
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                          src={`https://img.youtube.com/vi/${material.youtube_video_id}/maxresdefault.jpg`} 
+                          src={`https://img.youtube.com/vi/${validYoutubeId}/hqdefault.jpg`} 
                           alt="Video Thumbnail" 
                           onError={(e) => {
-                            e.currentTarget.src = `https://img.youtube.com/vi/${material.youtube_video_id}/hqdefault.jpg`;
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.style.display = 'none';
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20"></div>
@@ -211,10 +221,11 @@ export default function StudentMaterialContentPage() {
                       <div className="w-full aspect-video bg-black">
                         <iframe 
                           className="w-full h-full" 
-                          src={`https://www.youtube-nocookie.com/embed/${material.youtube_video_id}?autoplay=1&rel=0&modestbranding=1`} 
+                          src={`https://www.youtube-nocookie.com/embed/${validYoutubeId}?autoplay=1&rel=0&modestbranding=1`} 
                           title="Video Tutorial" 
                           frameBorder="0" 
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                           allowFullScreen
                         ></iframe>
                       </div>
